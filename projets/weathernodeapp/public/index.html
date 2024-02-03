@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="../01-bootstrap/css/bootstrap.min.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .band {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        background-color: lightblue;
+        color: white;
+      }
+      article {
+        font-size: 1.5rem;
+      }
+      h1 {
+        font-size: 3rem;
+        font-weight: bolder;
+      }
+      h2 {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .row {
+        margin-top: 2rem;
+      }
+    </style>
+    <script src="../bootstrap-5.3.0-alpha3-dist/js/bootstrap.js"></script>
+  </head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <script src="//d3js.org/d3.v3.min.js"></script>
+  <body>
+    <div>
+      <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Open-meteo</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarText"
+            aria-controls="navbarText"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Features</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+              </li>
+            </ul>
+            <span class="navbar-text">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="25"
+                height="25"
+                fill="currentColor"
+                class="bi bi-twitter"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="band">
+      <h1>Weather Forecast API</h1>
+      <article>
+        Seamless integration of high-resolution weather models with up 16 days
+        forecast
+      </article>
+    </div>
+    <form>
+      <h2>Select City</h2>
+      <div class="row">
+        <div class="col input-group mb-3">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Select City"
+            name="position"
+            aria-label="Longitude"
+            id="select"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="button-addon2"
+          >
+            search
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Latitude"
+            name="position"
+            aria-label="Latitude"
+            id="lat"
+          />
+        </div>
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Longitude"
+            name="position"
+            aria-label="Longitude"
+            id="long"
+          />
+        </div>
+        <div class="col input-group mb-3">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="City"
+            name="position"
+            aria-label="Longitude"
+            id="countries"
+          />
+        </div>
+      </div>
+    </form>
+    <form>
+      <h2>City information</h2>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th scope="row">Latitude</th>
+            <td id="latitude"></td>
+          </tr>
+          <tr>
+            <th scope="row">Longitude</th>
+            <td id="longitude"></td>
+          </tr>
+          <tr>
+            <th scope="row">Elevation</th>
+            <td id="elevation"></td>
+          </tr>
+          <tr>
+            <th scope="row">Generationtime_ms</th>
+            <td id="generationtime_ms"></td>
+          </tr>
+          <tr>
+            <th scope="row">Utc_offset_seconds</th>
+            <td id="utc_offset_seconds"></td>
+          </tr>
+          <tr>
+            <th scope="row">Timezone</th>
+            <td id="timezone"></td>
+          </tr>
+          <tr>
+            <th scope="row">Timezone_abbreviation</th>
+            <td id="timezone_abbreviation"></td>
+          </tr>
+          <tr>
+            <th scope="row">hourly_units</th>
+            <td>
+              <table>
+                <tr>
+                  <td id="timeHU"></td>
+                </tr>
+                <tr>
+                  <td id="temperature_2mHU"></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">hourly</th>
+            <td>
+              <table>
+                <tr>
+                  <td id="timeH"></td>
+                </tr>
+                <tr>
+                  <td id="temperature_2mH"></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Current_weather</th>
+            <td>
+              <table>
+                <tr>
+                  <td>Time</td>
+                  <td class="time"></td>
+                </tr>
+                <tr>
+                  <td>Temperature</td>
+                  <td class="temperature"></td>
+                </tr>
+                <tr>
+                  <td>Weathercode</td>
+                  <td class="weathercode"></td>
+                </tr>
+                <tr>
+                  <td>Windspeed</td>
+                  <td class="windspeed"></td>
+                </tr>
+                <tr>
+                  <td>Winddirection</td>
+                  <td class="Winddirection"></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-primary" id="Save">Save</button>
+      <div>
+        <canvas id="myChart" style="width: 100%; max-width: 1500px"></canvas>
+      </div>
+      <div>
+        <svg id="myPlot" style="width: 500px; height: 500px"></svg>
+      </div>
+    </form>
+    <script>
+      const mypostion = document.getElementById("button-addon2");
+
+      mypostion.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        };
+
+        function success(position) {
+          const { latitude, longitude } = position.coords;
+
+          document.getElementById("lat").value = `${latitude}`;
+          document.getElementById("long").value = `${longitude}`;
+        }
+        function error(err) {
+          console.warn(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error, options);
+      });
+
+      document.getElementById("select").addEventListener("input", (e) => {
+        e.preventDefault();
+        const country = document.getElementById("select").value;
+        document.getElementById("countries").value = country;
+        console.log(country);
+        const envoieData = async () => {
+          try {
+            const envoie = await fetch(
+              `https://geocoding-api.open-meteo.com/v1/search?name=${country}`
+            );
+            const response = await envoie.json();
+            console.log("Response: ", response);
+            for (let i = 0; i < response.length; i++) {
+              console.log(response.results[i].name);
+            }
+
+            if (
+              !(
+                Object.keys(response).length === 0 &&
+                response.constructor === Object
+              )
+            ) {
+              if (Array.isArray(response.jsonData)) {
+                response.jsonData.forEach((obj) => {
+                  Object.entries(obj).forEach(([key, value]) => {
+                    console.log(`${key} ${value}`);
+                  });
+                  console.log(obj);
+                });
+              }
+              const latitude = response.results[0].latitude;
+              const longitude = response.results[0].longitude;
+              const elevation = response.results[0].elevation;
+
+              document.getElementById("lat").value = `${latitude}`;
+              document.getElementById("long").value = `${longitude}`;
+              document.getElementById("latitude").textContent = `${latitude}`;
+              document.getElementById("longitude").textContent = `${longitude}`;
+              document.getElementById("elevation").textContent = `${elevation}`;
+            }
+
+            const envoie1 = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${response.results[0].latitude}&longitude=${response.results[0].longitude}`
+            );
+            const response1 = await envoie1.json();
+            if (
+              !(
+                Object.keys(response1).length === 0 &&
+                response1.constructor === Object
+              )
+            ) {
+              if (Array.isArray(response1.jsonData)) {
+                response1.jsonData.forEach((obj) => {
+                  Object.entries(obj).forEach(([key, value]) => {
+                    console.log(`${key} ${value}`);
+                  });
+                  console.log(obj);
+                });
+              }
+
+              const generationtimems = response1.generationtime_ms;
+              const utcoffsetseconds = response1.utc_offset_seconds;
+              const timezone = response1.timezone;
+              const timezoneabbreviation = response1.timezone_abbreviation;
+
+              document.getElementById(
+                "generationtime_ms"
+              ).textContent = `${generationtimems}`;
+              document.getElementById(
+                "utc_offset_seconds"
+              ).textContent = `${utcoffsetseconds}`;
+              document.getElementById("timezone").textContent = `${timezone}`;
+              document.getElementById(
+                "timezone_abbreviation"
+              ).textContent = `${timezoneabbreviation}`;
+            }
+
+            console.log("try ok");
+            console.log("Response1: ", response1);
+          } catch (error) {
+            console.log(error);
+          }
+        };
+
+        envoieData();
+      });
+
+      document.getElementById("Save").addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const latitude = document.getElementById("lat").value;
+        const longitude = document.getElementById("long").value;
+
+        const envoie1 = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m`
+        );
+        const response1 = await envoie1.json();
+        console.log("temperature", response1.hourly.temperature_2m);
+        console.log("donnee json depuis forecast", response1);
+
+        const handleData = async () => {
+          const saveData = await fetch("http://localhost:3000/api/post", {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+            body: JSON.stringify(response1),
+          });
+
+          try {
+            const response2 = await saveData.json();
+            console.log("Response2: ", response2);
+
+            const xValues = response2.hourly.time;
+            const yValues = response2.hourly.temperature_2m;
+
+            new Chart("myChart", {
+              type: "line",
+              data: {
+                labels: xValues,
+                datasets: [
+                  {
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: yValues,
+                  },
+                ],
+              },
+              options: {
+                legend: { display: false },
+                scales: {
+                  yAxes: [{ ticks: { min: 10, max: 40 } }],
+                },
+                title: {
+                  display: true,
+                  text: "Temperature graphic",
+                },
+              },
+            });
+
+            const xSize = 500;
+            const ySize = 500;
+            const margin = 40;
+            const xMax = xSize - margin * 2;
+            const yMax = ySize - margin * 2;
+
+            const svg = d3.select("#myPlot")
+              .append("svg")
+              .attr("width", xSize)
+              .attr("height", ySize)
+              .append("g")
+              .attr("transform", "translate(" + margin + "," + margin + ")");
+
+            const xScale = d3.scale.linear()
+              .domain([d3.min(xValues), d3.max(xValues)])
+              .range([0, xMax]);
+              
+            const xAxis = d3.svg.axis()
+              .scale(xScale)
+              .orient("bottom");
+            
+            svg.append("g")
+              .attr("transform", "translate(0," + yMax + ")")
+              .call(xAxis);
+
+            const yScale = d3.scale.linear()
+              .domain([d3.min(yValues), d3.max(yValues)])
+              .range([yMax, 0]);
+
+              const yAxis = d3.svg.axis()
+              .scale(yScale)
+              .orient("left");
+
+            svg.append("g").call(yAxis);
+
+            svg.append("g")
+              .selectAll("dot")
+              .data(xValues)
+              .enter()
+              .append("circle")
+              .attr("cx", function (d, i) {
+                return xScale(d);
+              })
+              .attr("cy", function (d, i) {
+                return yScale(yValues[i]);
+              })
+              .attr("r", 3)
+              .style("fill", "red");
+          } catch (error) {
+            console.log(error);
+          }
+        };
+        handleData();
+      });
+    </script>
+  </body>
+</html>
